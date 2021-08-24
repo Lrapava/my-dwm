@@ -214,6 +214,7 @@ static unsigned int getsystraywidth();
 static int gettextprop(Window w, Atom atom, char *text, unsigned int size);
 static void grabbuttons(Client *c, int focused);
 static void grabkeys(void);
+static char* help();
 static void incnmaster(const Arg *arg);
 static void keypress(XEvent *e);
 static void killclient(const Arg *arg);
@@ -939,8 +940,18 @@ drawbar(Monitor *m)
 
 	if ((w = m->ww - tw - stw - x) > bh) {
 		if (m->sel) {
-			drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
-			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
+			if (centclientname) {
+        	    /* fix overflow when window name is bigger than window width */
+				int mid = (m->ww - (int)TEXTW(m->sel->name)) / 2 - x;
+				/* make sure name will not overlap on tags even when it is very long */
+				mid = mid >= lrpad / 2 ? mid : lrpad / 2;
+				drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
+			
+				drw_text(drw, x, 0, w, bh, mid, m->sel->name, 0);
+			} else {
+				drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
+				drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
+			}
 			if (m->sel->isfloating)
 				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
 		} else {
@@ -1191,6 +1202,12 @@ grabkeys(void)
 					XGrabKey(dpy, code, keys[i].mod | modifiers[j], root,
 						True, GrabModeAsync, GrabModeAsync);
 	}
+}
+
+char*
+help(void)
+{
+	return "usage: dwm [-hv] [-fn font] [-nb color] [-nf color] [-sb color] [-sf color]\n[-df font] [-dnf color] [-dnb color] [-dsf color] [-dsb color]\n";
 }
 
 void
@@ -2747,13 +2764,53 @@ zoom(const Arg *arg)
 	pop(c);
 }
 
+void
+startup() {
+
+/*
+	const char *dwm_startup[] = { "dwm_startup", NULL };
+
+	Arg arg;
+	arg.v = dwm_startup;
+	
+	const Arg* argp = &arg;
+	spawn(argp);
+// */ 
+
+	system("dwm_startup&");
+
+}
+
 int
 main(int argc, char *argv[])
 {
-	if (argc == 2 && !strcmp("-v", argv[1]))
-		die("dwm-"VERSION);
-	else if (argc != 1)
-		die("usage: dwm [-v]");
+	startup();
+	for(int i=1;i<argc;i+=1)
+		if (!strcmp("-v", argv[i]))
+			die("dwm-"VERSION);
+		else if (!strcmp("-h", argv[i]) || !strcmp("--help", argv[i]))
+			die(help());
+		else if (!strcmp("-fn", argv[i])) /* font set */
+			fonts[0] = argv[++i];
+		else if (!strcmp("-nb",argv[i])) /* normal background color */
+			colors[SchemeNorm][1] = argv[++i];
+		else if (!strcmp("-nf",argv[i])) /* normal foreground color */
+			colors[SchemeNorm][0] = argv[++i];
+		else if (!strcmp("-sb",argv[i])) /* selected background color */
+			colors[SchemeSel][1] = argv[++i];
+		else if (!strcmp("-sf",argv[i])) /* selected foreground color */
+			colors[SchemeSel][0] = argv[++i];
+		else if (!strcmp("-df", argv[i])) /* dmenu font */
+			dmenucmd[4] = argv[++i];
+		else if (!strcmp("-dnb",argv[i])) /* dmenu normal background color */
+			dmenucmd[6] = argv[++i];
+		else if (!strcmp("-dnf",argv[i])) /* dmenu normal foreground color */
+			dmenucmd[8] = argv[++i];
+		else if (!strcmp("-dsb",argv[i])) /* dmenu selected background color */
+			dmenucmd[10] = argv[++i];
+		else if (!strcmp("-dsf",argv[i])) /* dmenu selected foreground color */
+			dmenucmd[12] = argv[++i];
+		else die(help());
 	if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
 		fputs("warning: no locale support\n", stderr);
 	if (!(dpy = XOpenDisplay(NULL)))

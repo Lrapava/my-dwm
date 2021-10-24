@@ -10,10 +10,9 @@ static const char *voldowncmd[] = { "amixer", "-q", "set", "Master", "5%-", "unm
 static const char *mutemic[] = { "amixer", "set", "Capture", "toggle", NULL };
 static const char *slock[] = { "./lock.sh", NULL };
 
-static const char *browser[] = { "firefox", NULL };
+static const char *browser[] = { "chromium-browser-privacy", NULL };
 static const char *steam[] = { "steam", NULL};
 static const char *screenshot[] = { "flameshot", "gui", NULL };
-static const char *fmenu[] = { "fmenu", NULL };
 // static const char *rect_screenshot[] = { "scrot", "-s", NULL };
 
 static const char *settings[] = { "./settings.sh", NULL };
@@ -21,7 +20,7 @@ static const char *settings[] = { "./settings.sh", NULL };
 
 // start/kill compositor
 static void skcomp() {
-	if (compositor_running) system("killall picom"); else system("picom&");
+	if (compositor_running) system("killall picom"); else system("picom --config ~/projects/picom/picom.sample.conf &");
 	compositor_running = (compositor_running + 1) % 2;
 }
 

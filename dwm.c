@@ -31,7 +31,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <X11/cursorfont.h>
-#include <X11/keysym.h>
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
 #include <X11/Xproto.h>
@@ -123,7 +122,7 @@ struct Client {
 
 typedef struct {
 	unsigned int mod;
-	KeySym keysym;
+	KeyCode keycode;
 	void (*func)(const Arg *);
 	const Arg arg;
 } Key;
@@ -214,7 +213,6 @@ static unsigned int getsystraywidth();
 static int gettextprop(Window w, Atom atom, char *text, unsigned int size);
 static void grabbuttons(Client *c, int focused);
 static void grabkeys(void);
-static char* help();
 static void incnmaster(const Arg *arg);
 static void keypress(XEvent *e);
 static void killclient(const Arg *arg);
@@ -258,6 +256,7 @@ static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
 static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
+static void togglescratch(const Arg *arg);
 static void togglefullscr(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
@@ -278,6 +277,7 @@ static void updatetitle(Client *c);
 static void updatewindowtype(Client *c);
 static void updatewmhints(Client *c);
 static void view(const Arg *arg);
+static void warp(const Client *c);
 static Client *wintoclient(Window w);
 static Monitor *wintomon(Window w);
 static Client *wintosystrayicon(Window w);
@@ -330,6 +330,8 @@ static Colormap cmap;
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
+
+static unsigned int scratchtag = 1 << LENGTH(tags);
 
 /* compile-time check if all tags fit into an unsigned int bit array. */
 struct NumTags { char limitexceeded[LENGTH(tags) > 31 ? -1 : 1]; };
@@ -940,18 +942,8 @@ drawbar(Monitor *m)
 
 	if ((w = m->ww - tw - stw - x) > bh) {
 		if (m->sel) {
-			if (centclientname) {
-        	    /* fix overflow when window name is bigger than window width */
-				int mid = (m->ww - (int)TEXTW(m->sel->name)) / 2 - x;
-				/* make sure name will not overlap on tags even when it is very long */
-				mid = mid >= lrpad / 2 ? mid : lrpad / 2;
-				drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
-			
-				drw_text(drw, x, 0, w, bh, mid, m->sel->name, 0);
-			} else {
-				drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
-				drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
-			}
+			drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
+			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
 			if (m->sel->isfloating)
 				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
 		} else {
@@ -1051,6 +1043,7 @@ focusmon(const Arg *arg)
 	unfocus(selmon->sel, 0);
 	selmon = m;
 	focus(NULL);
+	warp(selmon->sel);
 }
 
 void
@@ -1193,21 +1186,13 @@ grabkeys(void)
 	{
 		unsigned int i, j;
 		unsigned int modifiers[] = { 0, LockMask, numlockmask, numlockmask|LockMask };
-		KeyCode code;
-
+		
 		XUngrabKey(dpy, AnyKey, AnyModifier, root);
 		for (i = 0; i < LENGTH(keys); i++)
-			if ((code = XKeysymToKeycode(dpy, keys[i].keysym)))
-				for (j = 0; j < LENGTH(modifiers); j++)
-					XGrabKey(dpy, code, keys[i].mod | modifiers[j], root,
-						True, GrabModeAsync, GrabModeAsync);
+			for (j = 0; j < LENGTH(modifiers); j++)
+				XGrabKey(dpy, keys[i].keycode, keys[i].mod | modifiers[j], root,
+					 True, GrabModeAsync, GrabModeAsync);
 	}
-}
-
-char*
-help(void)
-{
-	return "usage: dwm [-hv] [-fn font] [-nb color] [-nf color] [-sb color] [-sf color]\n[-df font] [-dnf color] [-dnb color] [-dsf color] [-dsb color]\n";
 }
 
 void
@@ -1233,13 +1218,11 @@ void
 keypress(XEvent *e)
 {
 	unsigned int i;
-	KeySym keysym;
 	XKeyEvent *ev;
 
 	ev = &e->xkey;
-	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
 	for (i = 0; i < LENGTH(keys); i++)
-		if (keysym == keys[i].keysym
+		if (ev->keycode == keys[i].keycode
 		&& CLEANMASK(keys[i].mod) == CLEANMASK(ev->state)
 		&& keys[i].func)
 			keys[i].func(&(keys[i].arg));
@@ -1297,6 +1280,14 @@ manage(Window w, XWindowAttributes *wa)
 		&& (c->x + (c->w / 2) < c->mon->wx + c->mon->ww)) ? bh : c->mon->my);
 	c->bw = borderpx;
 
+	selmon->tagset[selmon->seltags] &= ~scratchtag;
+	if (!strcmp(c->name, scratchpadname)) {
+		c->mon->tagset[c->mon->seltags] |= c->tags = scratchtag;
+		c->isfloating = True;
+		c->x = c->mon->wx + (c->mon->ww / 2 - WIDTH(c) / 2);
+		c->y = c->mon->wy + (c->mon->wh / 2 - HEIGHT(c) / 2);
+	}
+
 	wc.border_width = c->bw;
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
 	XSetWindowBorder(dpy, w, scheme[SchemeNorm][ColBorder].pixel);
@@ -1304,6 +1295,8 @@ manage(Window w, XWindowAttributes *wa)
 	updatewindowtype(c);
 	updatesizehints(c);
 	updatewmhints(c);
+	c->x = c->mon->mx + (c->mon->mw - WIDTH(c)) / 2;
+	c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2;
 	XSelectInput(dpy, w, EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask);
 	grabbuttons(c, 0);
 	if (!c->isfloating)
@@ -1434,7 +1427,7 @@ movemouse(const Arg *arg)
 			handler[ev.type](&ev);
 			break;
 		case MotionNotify:
-			if ((ev.xmotion.time - lasttime) <= (1000 / 60))
+			if ((ev.xmotion.time - lasttime) <= (1000 / 120))
 				continue;
 			lasttime = ev.xmotion.time;
 
@@ -1642,7 +1635,7 @@ resizemouse(const Arg *arg)
 			handler[ev.type](&ev);
 			break;
 		case MotionNotify:
-			if ((ev.xmotion.time - lasttime) <= (1000 / 60))
+			if ((ev.xmotion.time - lasttime) <= (1000 / 120))
 				continue;
 			lasttime = ev.xmotion.time;
 
@@ -1706,6 +1699,8 @@ restack(Monitor *m)
 	}
 	XSync(dpy, False);
 	while (XCheckMaskEvent(dpy, EnterWindowMask, &ev));
+	if (m == selmon && (m->tagset[m->seltags] & m->sel->tags) && selmon->lt[selmon->sellt] != &layouts[2])
+		warp(m->sel);
 }
 
 void
@@ -2036,6 +2031,7 @@ spawn(const Arg *arg)
 {
 	if (arg->v == dmenucmd)
 		dmenumon[0] = '0' + selmon->num;
+	selmon->tagset[selmon->seltags] &= ~scratchtag;
 	if (fork() == 0) {
 		if (dpy)
 			close(ConnectionNumber(dpy));
@@ -2140,6 +2136,28 @@ togglefullscr(const Arg *arg)
 {
   if(selmon->sel)
     setfullscreen(selmon->sel, !selmon->sel->isfullscreen);
+}
+
+void
+togglescratch(const Arg *arg)
+{
+	Client *c;
+	unsigned int found = 0;
+
+	for (c = selmon->clients; c && !(found = c->tags & scratchtag); c = c->next);
+	if (found) {
+		unsigned int newtagset = selmon->tagset[selmon->seltags] ^ scratchtag;
+		if (newtagset) {
+			selmon->tagset[selmon->seltags] = newtagset;
+			focus(NULL);
+			arrange(selmon);
+		}
+		if (ISVISIBLE(c)) {
+			focus(c);
+			restack(selmon);
+		}
+	} else
+		spawn(arg);
 }
 
 void
@@ -2621,6 +2639,28 @@ view(const Arg *arg)
 	arrange(selmon);
 }
 
+void
+warp(const Client *c)
+{
+	int x, y;
+
+	if (!c) {
+		XWarpPointer(dpy, None, root, 0, 0, 0, 0, selmon->wx + selmon->ww/2, selmon->wy + selmon->wh/2);
+		return;
+	}
+
+	if (!getrootptr(&x, &y) ||
+	    (x > c->x - c->bw &&
+	     y > c->y - c->bw &&
+	     x < c->x + c->w + c->bw*2 &&
+	     y < c->y + c->h + c->bw*2) ||
+	    (y > c->mon->by && y < c->mon->by + bh) ||
+	    (c->mon->topbar && !y))
+		return;
+
+	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w / 2, c->h / 2);
+}
+
 Client *
 wintoclient(Window w)
 {
@@ -2785,32 +2825,10 @@ int
 main(int argc, char *argv[])
 {
 	startup();
-	for(int i=1;i<argc;i+=1)
-		if (!strcmp("-v", argv[i]))
-			die("dwm-"VERSION);
-		else if (!strcmp("-h", argv[i]) || !strcmp("--help", argv[i]))
-			die(help());
-		else if (!strcmp("-fn", argv[i])) /* font set */
-			fonts[0] = argv[++i];
-		else if (!strcmp("-nb",argv[i])) /* normal background color */
-			colors[SchemeNorm][1] = argv[++i];
-		else if (!strcmp("-nf",argv[i])) /* normal foreground color */
-			colors[SchemeNorm][0] = argv[++i];
-		else if (!strcmp("-sb",argv[i])) /* selected background color */
-			colors[SchemeSel][1] = argv[++i];
-		else if (!strcmp("-sf",argv[i])) /* selected foreground color */
-			colors[SchemeSel][0] = argv[++i];
-		else if (!strcmp("-df", argv[i])) /* dmenu font */
-			dmenucmd[4] = argv[++i];
-		else if (!strcmp("-dnb",argv[i])) /* dmenu normal background color */
-			dmenucmd[6] = argv[++i];
-		else if (!strcmp("-dnf",argv[i])) /* dmenu normal foreground color */
-			dmenucmd[8] = argv[++i];
-		else if (!strcmp("-dsb",argv[i])) /* dmenu selected background color */
-			dmenucmd[10] = argv[++i];
-		else if (!strcmp("-dsf",argv[i])) /* dmenu selected foreground color */
-			dmenucmd[12] = argv[++i];
-		else die(help());
+	if (argc == 2 && !strcmp("-v", argv[1]))
+		die("dwm-"VERSION);
+	else if (argc != 1)
+		die("usage: dwm [-v]");
 	if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
 		fputs("warning: no locale support\n", stderr);
 	if (!(dpy = XOpenDisplay(NULL)))

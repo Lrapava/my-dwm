@@ -15,18 +15,19 @@ static const unsigned int gappov    = 0;       /* vert outer gap between windows
 static       int smartgaps          = 0;       /* 1 means no outer gap when there is only one window */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const int focusonwheel       = 0;
 static const double activeopacity   = 1.0f;     /* Window opacity when it's focused (0 <= opacity <= 1) */
 static const double inactiveopacity = 1.0f;   /* Window opacity when it's inactive (0 <= opacity <= 1) */
 static const char *fonts[]          = { "monospace:size=10" };
 static const char dmenufont[]       = "monospace:size=10";
-static const char col_gray1[]       = "#232323"; // 222222
+static const char col_gray1[]       = "#232323"; // 232323 222222
 static const char col_gray2[]       = "#818588"; // 444444
 static const char col_gray3[]       = "#dddddd";
 static const char col_gray4[]       = "#ffffff";
 static const char col_cyan[]        = "#31758A"; // "#656e95"; 7b78ac 0a5b54 7170AB 03414e 31758A 428397 18A1A8 4C5AD4 2782de 31758A 248495
 static const unsigned int baralpha = 0xd0;
+// static const unsigned int OPAQUE = 255;
 static const unsigned int borderalpha = OPAQUE;
+
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },

@@ -10,7 +10,7 @@ static const char *voldowncmd[] = { "amixer", "-q", "set", "Master", "5%-", "unm
 static const char *mutemic[] = { "amixer", "set", "Capture", "toggle", NULL };
 static const char *slock[] = { "./lock.sh", NULL };
 
-static const char *browser[] = { "chromium-browser-privacy", NULL };
+static const char *browser[] = { "brave-browser", NULL };
 static const char *steam[] = { "steam", NULL};
 static const char *screenshot[] = { "flameshot", "gui", NULL };
 // static const char *rect_screenshot[] = { "scrot", "-s", NULL };

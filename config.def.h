@@ -105,50 +105,51 @@ static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34
 #include "movestack.c"
 #include "custom.c"
 static Key keys[] = {
-	/* modifier                     key        function        argument */
-	{ MODKEY,                       39,      spawn,     	   {.v = screenshot} },
-	// { MODKEY|ShiftMask,             39, 	   spawn, 		   {.v = rect_screenshot} },
-	{ MODKEY,                       9, 		 spawn,          {.v = slock } },
-	{ Mod1Mask|ShiftMask,           23,	   	 kbmanage, 	   {0}},
-	{ MODKEY|ShiftMask,             23,	   	 kbmanage, 	   {0}},
-	{ 0,              				121,     spawn,     	   {.v = mutecmd} },
-	{ 0,              				122, 	 spawn,     	   {.v = voldowncmd} },
-	{ 0,              				123, 	 spawn,          {.v = volupcmd} },
-	{ 0,              				198,	 spawn,          {.v = mutemic} },
+	/* modifier						key			function		argument */
+	{ MODKEY,						39,			spawn,			{.v = screenshot} },
+	// { MODKEY|ShiftMask,				39,			spawn,			v = rect_screenshot} },
+	{ MODKEY,						9,			spawn,			{.v = slock } },
+	{ Mod1Mask|ShiftMask,			23,			kbmanage,		{0}},
+	{ MODKEY|ShiftMask,				23,			kbmanage,		{0}},
+	{ 0,							121,		spawn,			{.v = mutecmd} },
+	{ 0,							122,		spawn,			{.v = voldowncmd} },
+	{ 0,							123,		spawn,			{.v = volupcmd} },
+	{ 0,							198,		spawn,			{.v = mutemic} },
 	// { MODKEY|ShiftMask,             XK_equal,  spawn,     	   {.v = volupcmd} },
 	// { MODKEY|ShiftMask,             XK_minus,  spawn,          {.v = voldowncmd} },
-	{ MODKEY|ShiftMask,             42,      skcomp,     	   {0} },
-	{ MODKEY,             			42,		 spawn,		   {.v = steam} },
-	{ MODKEY,                       25,      spawn,		   {.v = browser} },
-	{ MODKEY|ShiftMask,             26,	   	 spawn,		   {.v = settings} },
+	{ MODKEY|ShiftMask,				42,			skcomp,			{0} },
+	{ MODKEY,						42,			spawn,			{.v = steam} },
+	{ MODKEY,						25,			spawn,			{.v = browser} },
+	{ MODKEY|ShiftMask,				26,			spawn,			{.v = settings} },
+	{ MODKEY|ShiftMask,				58,			spawn,			{.v = mutemic} }, 
 	
-	{ MODKEY,                       49,  	 togglescratch,  {.v = scratchpadcmd } },
-	{ MODKEY,                       33,      spawn,          {.v = dmenucmd } },
-	{ MODKEY|ShiftMask,             36, 	 spawn,          {.v = termcmd } },
-	{ MODKEY,                       56,      togglebar,      {0} },
-	{ MODKEY,                       44,      focusstack,     {.i = +1 } },
-	{ MODKEY,                       45,      focusstack,     {.i = -1 } },
-	{ MODKEY,                       31,      incnmaster,     {.i = +1 } },
-	{ MODKEY,                       40,      incnmaster,     {.i = -1 } },
-	{ MODKEY,                       43,      setmfact,       {.f = -0.05} },
-	{ MODKEY,                       46,      setmfact,       {.f = +0.05} },
-	{ MODKEY|ShiftMask,             43,      setcfact,       {.f = +0.25} },
-	{ MODKEY|ShiftMask,             46,      setcfact,       {.f = -0.25} },
-	{ MODKEY|ShiftMask,             32,      setcfact,       {.f =  0.00} },
-	{ MODKEY|ShiftMask,             44,      movestack,      {.i = +1 } },
-	{ MODKEY|ShiftMask,             45,      movestack,      {.i = -1 } },
+	{ MODKEY,						49,			togglescratch,	{.v = scratchpadcmd } },
+	{ MODKEY,						33,			spawn,			{.v = dmenucmd } },
+	{ MODKEY|ShiftMask,				36,			spawn,			{.v = termcmd } },
+	{ MODKEY,						56,			togglebar,		{0} },
+	{ MODKEY,						44,			focusstack,		{.i = +1 } },
+	{ MODKEY,						45,			focusstack,		{.i = -1 } },
+	{ MODKEY,						31,			incnmaster,		{.i = +1 } },
+	{ MODKEY,						40,			incnmaster,		{.i = -1 } },
+	{ MODKEY,						43,			setmfact,		{.f = -0.05} },
+	{ MODKEY,						46,			setmfact,		{.f = +0.05} },
+	{ MODKEY|ShiftMask,				43,			setcfact,		{.f = +0.25} },
+	{ MODKEY|ShiftMask,				46,			setcfact,		{.f = -0.25} },
+	{ MODKEY|ShiftMask,				32,			setcfact,		{.f =  0.00} },
+	{ MODKEY|ShiftMask,				44,			movestack,		{.i = +1 } },
+	{ MODKEY|ShiftMask,				45,			movestack,		{.i = -1 } },
 
 	// normie shortcuts
-	{ MODKEY,                       116,      focusstack,     {.i = +1 } },
-	{ MODKEY,                       111,      focusstack,     {.i = -1 } },
-	{ MODKEY,                       113,      setmfact,       {.f = -0.05} },
-	{ MODKEY,                       114,      setmfact,       {.f = +0.05} },
-	{ MODKEY|ShiftMask,             113,      setcfact,       {.f = +0.25} },
-	{ MODKEY|ShiftMask,             114,      setcfact,       {.f = -0.25} },
-	{ MODKEY|ShiftMask,             116,      movestack,      {.i = +1 } },
-	{ MODKEY|ShiftMask,             111,      movestack,      {.i = -1 } },
+	{ MODKEY,                       116,		focusstack,		{.i = +1 } },
+	{ MODKEY,                       111,		focusstack,		{.i = -1 } },
+	{ MODKEY,                       113,		setmfact,		{.f = -0.05} },
+	{ MODKEY,                       114,		setmfact,		{.f = +0.05} },
+	{ MODKEY|ShiftMask,             113,		setcfact,		{.f = +0.25} },
+	{ MODKEY|ShiftMask,             114,		setcfact,		{.f = -0.25} },
+	{ MODKEY|ShiftMask,             116,		movestack,		{.i = +1 } },
+	{ MODKEY|ShiftMask,             111,		movestack,		{.i = -1 } },
 
-	{ MODKEY,                       36, zoom,           {0} },
+	{ MODKEY,						36,			zoom,			{0} },
 
 	// { MODKEY|Mod4Mask,              XK_u,      incrgaps,       {.i = +1 } },
 	// { MODKEY|Mod4Mask|ShiftMask,    XK_u,      incrgaps,       {.i = -1 } },
@@ -167,16 +168,16 @@ static Key keys[] = {
 	// { MODKEY|Mod4Mask,              XK_0,      togglegaps,     {0} },
 	// { MODKEY|Mod4Mask|ShiftMask,    XK_0,      defaultgaps,    {0} },
 
-	{ MODKEY|ShiftMask,             21,		incrgaps,       {.i = +1 } },
-	{ MODKEY,    					20,		incrgaps,       {.i = -1 } },
-	{ Mod1Mask|ShiftMask,           19,		togglegaps,     {0} },
-	{ MODKEY|Mod1Mask,    			19,		defaultgaps,    {0} },
+	{ MODKEY|ShiftMask,				21,			incrgaps,		{.i = +1 } },
+	{ MODKEY,						20,			incrgaps,		{.i = -1 } },
+	{ Mod1Mask|ShiftMask,			19,			togglegaps,		{0} },
+	{ MODKEY|Mod1Mask,				19,			defaultgaps,	{0} },
 	
-	{ Mod1Mask,                     23,		view,           {0} },
-	{ MODKEY,                       23,		view,           {0} },
-	{ MODKEY|ShiftMask,             54,		killclient,     {0} },
-	{ MODKEY,                       28,		setlayout,      {.v = &layouts[0]} },
-	{ MODKEY,                       58,		setlayout,      {.v = &layouts[1]} },
+	{ Mod1Mask,						23,			view,			{0} },
+	{ MODKEY,						23,			view,			{0} },
+	{ MODKEY|ShiftMask,				54,			killclient,		{0} },
+	{ MODKEY,						28,			setlayout,		{.v = &layouts[0]} },
+	{ MODKEY,						58,			setlayout,		{.v = &layouts[1]} },
 	// { MODKEY,                       XK_,      setlayout,      {.v = &layouts[2]} },
 	// { MODKEY|ShiftMask,             XK_,      setlayout,      {.v = &layouts[3]} },
 	// { MODKEY,                       XK_,      setlayout,      {.v = &layouts[4]} },
@@ -189,28 +190,28 @@ static Key keys[] = {
 	// { MODKEY,                       XK_,      setlayout,      {.v = &layouts[11]} },
 	// { MODKEY,                       XK_,      setlayout,      {.v = &layouts[12]} },
 	// { MODKEY,                       XK_,      setlayout,      {.v = &layouts[13]} },
-	{ MODKEY,                       41,		setlayout,      {.v = &layouts[14]} },
-	{ MODKEY|ControlMask,			59,		cyclelayout,    {.i = -1 } },
-	{ MODKEY|ControlMask,           60,		cyclelayout,    {.i = +1 } },
-	{ MODKEY,                       65,		setlayout,      {0} },
-	{ MODKEY|ShiftMask,             65,		togglefloating, {0} },
-	{ MODKEY|ShiftMask,             41,		togglefullscr,  {0} },
-	{ MODKEY,                       19,		view,           {.ui = ~0 } },
-	{ MODKEY|ShiftMask,             19,		tag,            {.ui = ~0 } },
-	{ MODKEY,                       59,		focusmon,       {.i = -1 } },
-	{ MODKEY,                       60,		focusmon,       {.i = +1 } },
-	{ MODKEY|ShiftMask,             59,		tagmon,         {.i = -1 } },
-	{ MODKEY|ShiftMask,             60,		tagmon,         {.i = +1 } },
-	TAGKEYS(                        10,                      0)
-	TAGKEYS(                        11,                      1)
-	TAGKEYS(                        12,                      2)
-	TAGKEYS(                        13,                      3)
-	TAGKEYS(                        14,                      4)
-	TAGKEYS(                        15,                      5)
-	TAGKEYS(                        16,                      6)
-	TAGKEYS(                        17,                      7)
-	TAGKEYS(                        18,                      8)
-	{ MODKEY|ShiftMask,             24,      quit,           {0} },
+	{ MODKEY,						41,			setlayout,		{.v = &layouts[14]} },
+	{ MODKEY|ControlMask,			59,			cyclelayout,	{.i = -1 } },
+	{ MODKEY|ControlMask,			60,			cyclelayout,	{.i = +1 } },
+	{ MODKEY,						65,			setlayout,		{0} },
+	{ MODKEY|ShiftMask,				65,			togglefloating,	{0} },
+	{ MODKEY|ShiftMask,				41,			togglefullscr,	{0} },
+	{ MODKEY,						19,			view,			{.ui = ~0 } },
+	{ MODKEY|ShiftMask,				19,			tag,			{.ui = ~0 } },
+	{ MODKEY,						59,			focusmon,		{.i = -1 } },
+	{ MODKEY,						60,			focusmon,		{.i = +1 } },
+	{ MODKEY|ShiftMask,				59,			tagmon,			{.i = -1 } },
+	{ MODKEY|ShiftMask,				60,			tagmon,			{.i = +1 } },
+	TAGKEYS(						10,							0)
+	TAGKEYS(						11,							1)
+	TAGKEYS(						12,							2)
+	TAGKEYS(						13,							3)
+	TAGKEYS(						14,							4)
+	TAGKEYS(						15,							5)
+	TAGKEYS(						16,							6)
+	TAGKEYS(						17,							7)
+	TAGKEYS(						18,							8)
+	{ MODKEY|ShiftMask,				24,			quit,			{0} },
 };
 
 /* button definitions */

@@ -109,6 +109,7 @@ static Key keys[] = {
 	{ MODKEY,						39,			spawn,			{.v = screenshot} },
 	// { MODKEY|ShiftMask,				39,			spawn,			v = rect_screenshot} },
 	{ MODKEY,						9,			spawn,			{.v = slock } },
+	{ MODKEY,						54,			spawn,			{.v = phone_gallery } },
 	{ Mod1Mask|ShiftMask,			23,			kbmanage,		{0}},
 	{ MODKEY|ShiftMask,				23,			kbmanage,		{0}},
 	{ 0,							121,		spawn,			{.v = mutecmd} },

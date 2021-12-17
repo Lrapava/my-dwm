@@ -4,10 +4,11 @@
 
 int compositor_running = 1, curkb = 0;
 
-static const char *mutecmd[] = { "amixer", "-q", "set", "Master", "toggle", NULL };
-static const char *volupcmd[] = { "amixer", "-q", "set", "Master", "5%+", "unmute", NULL };
-static const char *voldowncmd[] = { "amixer", "-q", "set", "Master", "5%-", "unmute", NULL };
+static const char *mutecmd[] = { "pactl", "set-sink-mute", "@DEFAULT_SINK@", "toggle", NULL };
+static const char *volupcmd[] = { "pactl", "set-sink-volume", "@DEFAULT_SINK@", "+5%", NULL };
+static const char *voldowncmd[] = { "pactl", "set-sink-volume", "@DEFAULT_SINK@", "-5%", NULL };
 static const char *mutemic[] = { "amixer", "set", "Capture", "toggle", NULL };
+static const char *phone_gallery[] = { "pcmanfm", "/home/lrapava/Pictures/Android Camera/Camera", NULL };
 static const char *slock[] = { "./lock.sh", NULL };
 
 static const char *browser[] = { "brave-browser", NULL };

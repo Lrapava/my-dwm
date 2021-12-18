@@ -1,4 +1,5 @@
-#include <X11/XF86keysym.h>
+// #include <X11/XF86keysym.h>
+#include "xevkeys.h"
 #include <stddef.h>
 #include <stdlib.h>
 

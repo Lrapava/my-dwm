@@ -2804,27 +2804,11 @@ zoom(const Arg *arg)
 	pop(c);
 }
 
-void
-startup() {
-
-/*
-	const char *dwm_startup[] = { "dwm_startup", NULL };
-
-	Arg arg;
-	arg.v = dwm_startup;
-	
-	const Arg* argp = &arg;
-	spawn(argp);
-// */ 
-
-	system("dwm_startup&");
-
-}
 
 int
 main(int argc, char *argv[])
 {
-	startup();
+	onStart();
 	if (argc == 2 && !strcmp("-v", argv[1]))
 		die("dwm-"VERSION);
 	else if (argc != 1)
@@ -2843,5 +2827,6 @@ main(int argc, char *argv[])
 	run();
 	cleanup();
 	XCloseDisplay(dpy);
+	onExit();
 	return EXIT_SUCCESS;
 }

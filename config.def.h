@@ -116,10 +116,10 @@ static Key keys[] = {
 	{ 0,                            123,       spawn,          {.v = volupcmd} },
 	{ 0,                            198,       spawn,          {.v = mutemic} },
 	{ Mod1Mask,                     XK_m,      spawn,          {.v = mutemic} },
-	{ MODKEY|ShiftMask,             XK_g,      skcomp,         {0} },
+	{ MODKEY|ShiftMask,             XK_g,      toggle_gaming_mode, {0} },
 	{ MODKEY,                       XK_g,      spawn,          {.v = steam} },
 	{ MODKEY,                       XK_w,      spawn,          {.v = browser} },
-	{ MODKEY|ShiftMask,             XK_e,      spawn,          {.v = settings} },
+	// { MODKEY|ShiftMask,             XK_e,      spawn,          {.v = settings} },
 	
 	{ MODKEY,                       XK_grave,  togglescratch,  {.v = scratchpadcmd } },
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
